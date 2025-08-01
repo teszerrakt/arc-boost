@@ -95,6 +95,86 @@
   animation: arc-boost-sprint-flash 1.2s ease-out !important;
 }
 
+/* Thanos snap animation */
+@keyframes arc-boost-thanos-snap {
+  0% {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+  }
+  20% {
+    opacity: 0.8 !important;
+    transform: scale(0.98) !important;
+  }
+  40% {
+    opacity: 0.6 !important;
+    transform: scale(0.95) !important;
+    filter: blur(0.5px) !important;
+  }
+  60% {
+    opacity: 0.4 !important;
+    transform: scale(0.9) !important;
+    filter: blur(1px) !important;
+  }
+  80% {
+    opacity: 0.2 !important;
+    transform: scale(0.8) !important;
+    filter: blur(2px) !important;
+  }
+  100% {
+    opacity: 0 !important;
+    transform: scale(0.5) !important;
+    filter: blur(3px) !important;
+    visibility: hidden !important;
+  }
+}
+
+@keyframes arc-boost-dust-particle {
+  0% {
+    opacity: 0 !important;
+    transform: scale(0) rotate(0deg) !important;
+  }
+  20% {
+    opacity: 0.8 !important;
+    transform: scale(1) rotate(90deg) !important;
+  }
+  100% {
+    opacity: 0 !important;
+    transform: scale(0.2) rotate(360deg) translateY(-50px) !important;
+  }
+}
+
+.arc-boost-thanos-snap {
+  animation: arc-boost-thanos-snap 1.5s ease-out forwards !important;
+  pointer-events: none !important;
+}
+
+.arc-boost-thanos-snap::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  width: 20px !important;
+  height: 20px !important;
+  background: radial-gradient(circle, #8B4513, #D2691E) !important;
+  border-radius: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  animation: arc-boost-dust-particle 1.5s ease-out !important;
+  z-index: 999 !important;
+}
+
+.arc-boost-thanos-snap::after {
+  content: '' !important;
+  position: absolute !important;
+  top: 30% !important;
+  right: 40% !important;
+  width: 15px !important;
+  height: 15px !important;
+  background: radial-gradient(circle, #A0522D, #CD853F) !important;
+  border-radius: 50% !important;
+  animation: arc-boost-dust-particle 1.5s ease-out 0.2s !important;
+  z-index: 999 !important;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   button.arc-boost-sprint-btn,
