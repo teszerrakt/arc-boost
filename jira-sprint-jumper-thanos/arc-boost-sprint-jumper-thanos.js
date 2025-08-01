@@ -41,10 +41,28 @@
   };
 
   const getAllSprintSections = () => {
-    return Array.from(document.querySelectorAll('h2'))
-      .filter(h2 => h2.textContent.trim().startsWith('Web Sprint '))
-      .map(h2 => getTargetElement(h2))
-      .filter(Boolean);
+    // Find sprint containers and divider elements
+    const sprintContainers = Array.from(document.querySelectorAll('div[data-testid^="software-backlog.card-list.container."]'));
+    const dividerContainers = Array.from(document.querySelectorAll('div[data-testid="software-backlog.card-list.divider.container"]'));
+    
+    log(`Found ${sprintContainers.length} sprint containers and ${dividerContainers.length} divider containers`);
+    
+    // Log each container for debugging
+    sprintContainers.forEach((container, index) => {
+      const headers = container.querySelectorAll('h2');
+      const sprintName = Array.from(headers)[0]?.textContent.trim() || 'No header found';
+      log(`Sprint container ${index + 1}: "${sprintName}"`);
+    });
+    
+    dividerContainers.forEach((container, index) => {
+      log(`Divider container ${index + 1}: Found divider element`);
+    });
+    
+    // Combine both types of containers
+    const allContainers = [...sprintContainers, ...dividerContainers];
+    log(`Total containers to manage: ${allContainers.length}`);
+    
+    return allContainers;
   };
 
   let snappedSections = [];
@@ -90,32 +108,44 @@
     log('All sections restored');
   };
 
-  const findSprintElement = (sprintText) => {
-    return Array.from(document.querySelectorAll('h2'))
-      .find(h2 => h2.textContent.trim() === sprintText);
-  };
-
-  const getTargetElement = (h2) => {
-    const container = h2.closest('div[data-drop-target-for-element="true"]');
-    return container?.parentElement || container || h2;
-  };
-
-  const scrollToCurrentWeekWebSprint = () => {
+  const findCurrentSprintContainer = () => {
     const sprintText = `Web Sprint ${getMondayString()}`;
     log('Looking for:', sprintText);
     
-    const h2 = findSprintElement(sprintText);
-    if (h2) {
-      const targetElement = getTargetElement(h2);
-      scrollAndFlash(targetElement);
+    // Find all sprint containers using the data-testid pattern
+    const allContainers = Array.from(document.querySelectorAll('div[data-testid^="software-backlog.card-list.container."]'));
+    
+    // Look for current week's sprint in each container
+    for (const container of allContainers) {
+      const headers = container.querySelectorAll('h2');
+      
+      for (const h2 of headers) {
+        const text = h2.textContent.trim();
+        if (text === sprintText) {
+          log(`Found current sprint container: "${text}"`);
+          return container;
+        }
+      }
+    }
+    
+    log('Current sprint container not found');
+    return null;
+  };
+
+  const scrollToCurrentWeekWebSprint = () => {
+    const currentSprintContainer = findCurrentSprintContainer();
+    
+    if (currentSprintContainer) {
+      scrollAndFlash(currentSprintContainer);
       
       // Trigger Thanos snap after a short delay
       setTimeout(() => {
-        thanosSnapOtherSections(targetElement);
+        thanosSnapOtherSections(currentSprintContainer);
       }, CONFIG.FLASH_DELAY + 500);
       
-      log('Successfully jumped to sprint:', sprintText);
+      log('Successfully jumped to current sprint');
     } else {
+      const sprintText = `Web Sprint ${getMondayString()}`;
       log('Sprint not found:', sprintText);
       alert(`No element found for "${sprintText}"`);
     }
